@@ -59,32 +59,33 @@ UPLOADER = {
         Upload.prototype = {
             progress: function(callback){
                 this.req.upload.onprogress = function(e) {
-                    callback(e.loaded/e.total, e.total, e.loaded);
+                    var loaded = e.loaded/e.total;
+                    callback(+(loaded.toString() !== "NaN" && loaded), e.total, e.loaded);
                 }
                 return this;
             },
-            //Need to improve the success and error functions... they are overwriting each other
             success: function(callback){
                 var req = this.req;
-                this.req.onreadystatechange = function(){
-                    if (req.readyState === XMLHttpRequest.DONE) {
+                this.req.onloadend = function(e){
+                    console.log(e.target.status);
+                    if (e.target.readyState == XMLHttpRequest.DONE && (e.target.status >=200 && e.target.status <=299)) {
                         var data;
                         try {data = JSON.parse(req.response);} 
                         catch (error) {data = req.response;}
                         callback(data, req.status, req.getAllResponseHeaders().split("\n"));
+                    } else {
+                        e.target.onerror();
                     }
                 }
                 return this;
             },
             error: function(callback){
                 var req = this.req;
-                this.req.onreadystatechange = function(){
-                    if (req.readyState === XMLHttpRequest.UNSENT) {
-                        var data;
-                        try {data = JSON.parse(req.response);} 
-                        catch (error) {data = req.response;}
-                        callback(data, req.status, req.getAllResponseHeaders().split("\n"));
-                    }
+                this.req.onerror = function(){
+                    var data;
+                    try {data = JSON.parse(req.response);} 
+                    catch (error) {data = req.response;}
+                    callback(data, req.status, req.getAllResponseHeaders().split("\n"));
                 }
                 return this;
             }

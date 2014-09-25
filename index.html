@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Example</h1>
+        <input type="file" placeholder="HEY" id="inputFile" multiple><br>
+        <span>Uploaded (%)</span><input type="text" id="inputProgress"><br>
+        <span>Status (%)</span><input type="text" id="inputStatus"><br>
+        <textarea id="inputBody"></textarea><br>
+        <button onclick="send()">Upload File</button>
+        <script src="./uploader.js"></script>
+        <script>
+            function send(){
+                UPLOADER.send("/", inputFile.files)
+                .progress(function(loading, loaded, total){
+                    inputProgress.value = (loading*100);
+                })
+                .success(function(data, status, header){
+                    inputStatus.value = status;
+                    inputBody.value = data;
+                    alert("Finish");
+                })
+                .error(function(data, status, header){
+                    inputStatus.value = status;
+                    inputBody.value = data;
+                    alert("Error");
+                })
+            }
+        </script>
+    </body>
+</html>
