@@ -2,28 +2,31 @@
 <html>
     <body>
         <h1>Example</h1>
-        <input type="file" placeholder="HEY" id="inputFile" multiple><br>
-        <span>Uploaded (%)</span><input type="text" id="inputProgress"><br>
-        <span>Status (%)</span><input type="text" id="inputStatus"><br>
-        <textarea id="inputBody"></textarea><br>
+        <input type="text" id="inputProgress" placeholder="Uploaded"><br>
+        <input type="text" id="inputStatus" placeholder="Response Status"><br>
+        <textarea id="inputHeaders" placeholder="Response Headers"></textarea><br>
+        <textarea id="inputBody" placeholder="Response Body"></textarea><br>
         <button onclick="send()">Upload File</button>
+        <input type="file" placeholder="HEY" id="inputFile" multiple>
         <script src="./uploader.js"></script>
         <script>
             function send(){
                 UPLOADER.send("/", inputFile.files)
-                .progress(function(loading, loaded, total){
-                    inputProgress.value = (loading*100);
-                })
-                .success(function(data, status, header){
-                    inputStatus.value = status;
-                    inputBody.value = data;
-                    alert("Finish");
-                })
-                .error(function(data, status, header){
-                    inputStatus.value = status;
-                    inputBody.value = data;
-                    alert("Error");
-                })
+                    .progress(function(loading, loaded, total){
+                        inputProgress.value = (loading*100);
+                    })
+                    .success(function(data, status, headers){
+                        inputStatus.value = status;
+                        inputBody.value = data;
+                        inputHeaders.value = JSON.stringify(headers);
+                        alert("Finish");
+                    })
+                    .error(function(data, status, headers){
+                        inputStatus.value = status;
+                        inputBody.value = data;
+                        inputHeaders.value = JSON.stringify(headers);
+                        alert("Error");
+                    });
             }
         </script>
     </body>
